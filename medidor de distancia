@@ -1,0 +1,40 @@
+# una pantalla tft un arduino y un sensor ultrasonico
+#include <Adafruit_GFX.h>
+#include <Adafruit_ST7735.h>
+#include <NewPing.h>
+
+#define TRIGGER_PIN 2
+#define ECHO_PIN 3
+#define TFT_CS 10
+#define TFT_RST 8
+#define TFT_DC 9
+
+#define MAX_DISTANCE 30
+
+Adafruit_ST7735 tft = Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
+NewPing sonar(TRIGGER_PIN, ECHO_PIN, MAX_DISTANCE);
+
+void setup() {
+  Serial.begin(9600);
+  tft.initR(INITR_BLACKTAB);
+  tft.fillScreen(ST7735_BLACK);
+  tft.setTextColor(ST7735_WHITE);
+  tft.setTextSize(2);
+}
+
+void loop() {
+  delay(50);
+  unsigned int distance = sonar.ping_cm();
+  Serial.print("Distance: ");
+  Serial.print(distance);
+  Serial.println(" cm");
+  tft.setCursor(0, 0);
+  tft.fillScreen(ST7735_BLACK);
+  if (distance < MAX_DISTANCE) {
+    tft.println("Distance:");
+    tft.println(distance);
+    tft.println("cm");
+  } else {
+    tft.println("No object detected");
+  }
+}
