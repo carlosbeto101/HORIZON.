@@ -1,0 +1,47 @@
+#include <SoftwareSerial.h>
+
+const int trigPin = 9;
+const int echoPin = 10;
+int bandera =0;
+SoftwareSerial bluetooth(2, 3); // RX, TX
+
+void setup() {
+  Serial.begin(115200);
+  bluetooth.begin(9600);
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+}
+
+void loop() {
+  long duration, cm;
+
+  /* Send a 10 us pulse to the ultrasonic sensor */
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+
+  /* Measure the duration of the pulse on the echo pin */
+  duration = pulseIn(echoPin, HIGH);
+
+  /* Calculate the distance in cm */
+  cm = duration / 58;
+
+  /* Check if the distance is less than 15 cm */
+  if (cm < 15) {
+    if(bandera == 0)
+    {/* Send a signal to the NXP FRDM-KW41Z board */
+      Serial.println("Choque entre 2 autos a 1.45 km");
+      bluetooth.write("Choque entre 2 autos a 1.45 km");
+      //Serial.write("Choque entre 2 autos a 1.45 km");
+      bandera = 1;
+    }
+  }else
+  {
+    bandera=0;  
+  }
+  
+
+  delay(100);
+}
